@@ -1,0 +1,46 @@
+# Content Machine Workflow Dependencies
+
+# Core automation and API libraries
+requests==2.31.0
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# Flask for webhook handler
+flask==3.0.0
+
+# OpenAI for GPT-4 content generation
+openai==1.3.0
+
+# Google APIs for Docs integration
+google-auth==2.24.0
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.108.0
+
+# Notion API client
+notion-client==2.2.1
+
+# Slack notifications
+slack-sdk==3.26.0
+
+# Web scraping and HTTP utilities
+httpx==0.25.2
+beautifulsoup4==4.12.2
+
+# Data processing and validation
+pandas==2.1.4
+jsonschema==4.20.0
+textstat==0.7.3
+
+# Logging and monitoring
+structlog==23.2.0
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0
+
+# Optional: Self-hosting utilities
+docker==6.1.3
+docker-compose==1.29.2

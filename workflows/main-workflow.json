@@ -1,0 +1,424 @@
+{
+  "name": "Content Machine Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-machine",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "content-machine-webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.url }}",
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "name": "Authorization",
+          "value": "Bearer {{ $credentials.firecrawl.api_key }}"
+        },
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"url\": \"{{ $json.body.url }}\",\n  \"formats\": [\"markdown\", \"html\"],\n  \"onlyMainContent\": true,\n  \"includeTags\": [\"title\", \"meta\", \"h1\", \"h2\", \"h3\"],\n  \"excludeTags\": [\"nav\", \"footer\", \"aside\", \"script\", \"style\"],\n  \"waitFor\": 2000\n}",
+        "options": {}
+      },
+      "id": "firecrawl-scraper",
+      "name": "Firecrawl Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "firecrawl-auth",
+          "name": "Firecrawl API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "You are an expert content writer who specializes in creating engaging, conversational blog posts. Your writing style is friendly, informative, and includes strategic use of emojis to enhance readability."
+            },
+            {
+              "role": "user",
+              "message": "Rewrite the following article content into a conversational blog post format. Follow these guidelines:\n\n1. Use a friendly, conversational tone\n2. Add relevant emojis to enhance engagement (but don't overuse them)\n3. Break up long paragraphs into shorter, scannable sections\n4. Include clear headings and subheadings\n5. Add a compelling introduction and conclusion\n6. Make it actionable and valuable for readers\n\nOriginal content:\n{{ $json.data.content }}\n\nTitle: {{ $json.data.title }}\nURL: {{ $json.data.url }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.7
+        }
+      },
+      "id": "gpt-blog-generator",
+      "name": "Generate Blog Post",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "You are a social media expert who creates viral Twitter threads. You understand how to hook readers, maintain engagement across multiple tweets, and drive action."
+            },
+            {
+              "role": "user",
+              "message": "Create a 6-8 tweet Twitter thread based on the following article. Follow these guidelines:\n\n1. Tweet 1: Strong hook that grabs attention\n2. Tweets 2-6: Break down key insights, one per tweet\n3. Tweet 7: Add a personal insight or hot take\n4. Tweet 8: Clear call to action (engage, follow, share)\n5. Use emojis strategically\n6. Keep each tweet under 280 characters\n7. Make it engaging and shareable\n\nFormat as: Tweet 1/8: [content]\n\nOriginal content:\n{{ $('Firecrawl Scraper').item.json.data.content }}\n\nTitle: {{ $('Firecrawl Scraper').item.json.data.title }}\nURL: {{ $('Firecrawl Scraper').item.json.data.url }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.7
+        }
+      },
+      "id": "gpt-twitter-generator",
+      "name": "Generate Twitter Thread",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "You are a professional newsletter writer who creates concise, valuable summaries for busy executives and professionals. Your writing is clear, actionable, and respects the reader's time."
+            },
+            {
+              "role": "user",
+              "message": "Create a newsletter summary of the following article for busy professionals. Follow these guidelines:\n\n1. Start with a compelling subject line\n2. Write a 2-3 sentence executive summary\n3. Include 3-5 key takeaways as bullet points\n4. Add a 'Why This Matters' section\n5. Include a 'Quick Action' suggestion\n6. Keep the total length under 200 words\n7. Professional tone, no emojis\n\nOriginal content:\n{{ $('Firecrawl Scraper').item.json.data.content }}\n\nTitle: {{ $('Firecrawl Scraper').item.json.data.title }}\nURL: {{ $('Firecrawl Scraper').item.json.data.url }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.7
+        }
+      },
+      "id": "gpt-newsletter-generator",
+      "name": "Generate Newsletter",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 400],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "You are an SEO expert who analyzes content for search optimization opportunities. You identify keywords, themes, and create compelling titles that rank well."
+            },
+            {
+              "role": "user",
+              "message": "Analyze the following article for SEO opportunities and create a summary. Provide:\n\n1. Primary keyword (most important)\n2. 5-8 secondary keywords\n3. Main themes/topics covered\n4. 3 alternative article titles optimized for SEO\n5. Meta description (150-160 characters)\n6. Content gaps or opportunities for expansion\n7. Target audience analysis\n\nFormat your response as structured data.\n\nOriginal content:\n{{ $('Firecrawl Scraper').item.json.data.content }}\n\nTitle: {{ $('Firecrawl Scraper').item.json.data.title }}\nURL: {{ $('Firecrawl Scraper').item.json.data.url }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4000,
+          "temperature": 0.7
+        }
+      },
+      "id": "gpt-seo-generator",
+      "name": "Generate SEO Summary",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [680, 500],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "document",
+        "operation": "create",
+        "title": "{{ $('Firecrawl Scraper').item.json.data.title }} - Blog Post",
+        "body": {
+          "content": [
+            {
+              "insertText": {
+                "text": "# {{ $('Firecrawl Scraper').item.json.data.title }} - Blog Post\n\nSource: {{ $('Firecrawl Scraper').item.json.data.url }}\nGenerated: {{ $now }}\n\n---\n\n{{ $('Generate Blog Post').item.json.choices[0].message.content }}",
+                "location": {
+                  "index": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      "id": "google-docs-blog",
+      "name": "Save Blog to Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [900, 200],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-docs-oauth",
+          "name": "Google Docs OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "document",
+        "operation": "create",
+        "title": "{{ $('Firecrawl Scraper').item.json.data.title }} - Twitter Thread",
+        "body": {
+          "content": [
+            {
+              "insertText": {
+                "text": "# {{ $('Firecrawl Scraper').item.json.data.title }} - Twitter Thread\n\nSource: {{ $('Firecrawl Scraper').item.json.data.url }}\nGenerated: {{ $now }}\n\n---\n\n{{ $('Generate Twitter Thread').item.json.choices[0].message.content }}",
+                "location": {
+                  "index": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      "id": "google-docs-twitter",
+      "name": "Save Twitter to Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "google-docs-oauth",
+          "name": "Google Docs OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "name": "Authorization",
+          "value": "Bearer {{ $credentials.notion.token }}"
+        },
+        "url": "https://api.notion.com/v1/pages",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"parent\": {\n    \"database_id\": \"{{ $credentials.notion.database_id }}\"\n  },\n  \"properties\": {\n    \"Title\": {\n      \"title\": [\n        {\n          \"text\": {\n            \"content\": \"{{ $('Firecrawl Scraper').item.json.data.title }}\"\n          }\n        }\n      ]\n    },\n    \"URL\": {\n      \"url\": \"{{ $('Firecrawl Scraper').item.json.data.url }}\"\n    },\n    \"Status\": {\n      \"select\": {\n        \"name\": \"Generated\"\n      }\n    },\n    \"Created\": {\n      \"date\": {\n        \"start\": \"{{ $now }}\"\n      }\n    },\n    \"Content Types\": {\n      \"multi_select\": [\n        {\"name\": \"Blog Post\"},\n        {\"name\": \"Twitter Thread\"},\n        {\"name\": \"Newsletter\"},\n        {\"name\": \"SEO Summary\"}\n      ]\n    }\n  }\n}",
+        "options": {
+          "headers": {
+            "Notion-Version": "2022-06-28"
+          }
+        }
+      },
+      "id": "notion-storage",
+      "name": "Save to Notion Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "notion-auth",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "{{ $credentials.slack.webhook_url }}",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"text\": \"🚀 Content bundle ready for: {{ $('Firecrawl Scraper').item.json.data.title }}\",\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Content Machine - Bundle Ready! 🎉\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Title:* {{ $('Firecrawl Scraper').item.json.data.title }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Source:* <{{ $('Firecrawl Scraper').item.json.data.url }}|View Original>\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Generated:* {{ $now }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Content Types:* Blog Post, Twitter Thread, Newsletter, SEO Summary\"\n        }\n      ]\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Google Docs:*\\n• <{{ $('Save Blog to Google Docs').item.json.documentId }}|Blog Post>\\n• <{{ $('Save Twitter to Google Docs').item.json.documentId }}|Twitter Thread>\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "slack-notification",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Content bundle generated successfully\",\n  \"title\": \"{{ $('Firecrawl Scraper').item.json.data.title }}\",\n  \"url\": \"{{ $('Firecrawl Scraper').item.json.data.url }}\",\n  \"timestamp\": \"{{ $now }}\",\n  \"content_types\": [\n    \"blog_post\",\n    \"twitter_thread\",\n    \"newsletter_summary\",\n    \"seo_summary\"\n  ],\n  \"storage\": {\n    \"google_docs\": {\n      \"blog_post\": \"{{ $('Save Blog to Google Docs').item.json.documentId }}\",\n      \"twitter_thread\": \"{{ $('Save Twitter to Google Docs').item.json.documentId }}\"\n    },\n    \"notion_page\": \"{{ $('Save to Notion Database').item.json.id }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Firecrawl Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firecrawl Scraper": {
+      "main": [
+        [
+          {
+            "node": "Generate Blog Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Twitter Thread",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Newsletter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate SEO Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Blog Post": {
+      "main": [
+        [
+          {
+            "node": "Save Blog to Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Twitter Thread": {
+      "main": [
+        [
+          {
+            "node": "Save Twitter to Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Newsletter": {
+      "main": [
+        [
+          {
+            "node": "Save to Notion Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SEO Summary": {
+      "main": [
+        [
+          {
+            "node": "Save to Notion Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Blog to Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Twitter to Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Notion Database": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-07T10:07:56.000Z",
+  "versionId": "1"
+}

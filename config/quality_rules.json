@@ -1,0 +1,109 @@
+{
+  "readability": {
+    "min_flesch_score": 60,
+    "max_grade_level": 10,
+    "preferred_sentence_length": {
+      "min": 10,
+      "max": 25
+    }
+  },
+  "length_requirements": {
+    "blog_post": {
+      "min": 800,
+      "max": 2500,
+      "optimal": 1500
+    },
+    "twitter_thread": {
+      "min": 200,
+      "max": 800,
+      "optimal": 400
+    },
+    "newsletter_summary": {
+      "min": 150,
+      "max": 300,
+      "optimal": 200
+    },
+    "seo_summary": {
+      "min": 100,
+      "max": 500,
+      "optimal": 250
+    }
+  },
+  "engagement_factors": {
+    "question_ratio": {
+      "min": 0.02,
+      "max": 0.1
+    },
+    "emoji_ratio": {
+      "min": 0.001,
+      "max": 0.05
+    },
+    "call_to_action": true,
+    "personal_pronouns": {
+      "min": 0.01,
+      "max": 0.08
+    }
+  },
+  "quality_thresholds": {
+    "auto_approve": 8.0,
+    "requires_review": 6.0,
+    "reject": 4.0
+  },
+  "prohibited_patterns": [
+    "click here",
+    "lorem ipsum",
+    "\\[placeholder\\]",
+    "TODO:",
+    "FIXME:",
+    "test content",
+    "sample text"
+  ],
+  "required_elements": {
+    "blog_post": [
+      "introduction",
+      "conclusion",
+      "headings"
+    ],
+    "twitter_thread": [
+      "hook",
+      "call_to_action"
+    ],
+    "newsletter_summary": [
+      "key_takeaways",
+      "action_items"
+    ],
+    "seo_summary": [
+      "keywords",
+      "meta_description"
+    ]
+  },
+  "brand_guidelines": {
+    "tone": "professional_friendly",
+    "voice": "authoritative_helpful",
+    "prohibited_words": [
+      "cheap",
+      "guaranteed",
+      "amazing deal",
+      "limited time"
+    ],
+    "preferred_terminology": {
+      "AI": "artificial intelligence",
+      "ML": "machine learning",
+      "automation": "workflow automation"
+    }
+  },
+  "seo_requirements": {
+    "keyword_density": {
+      "min": 0.005,
+      "max": 0.03
+    },
+    "meta_description_length": {
+      "min": 150,
+      "max": 160
+    },
+    "title_length": {
+      "min": 30,
+      "max": 60
+    }
+  }
+}

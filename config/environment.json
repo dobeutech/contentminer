@@ -1,0 +1,45 @@
+{
+  "workflow_settings": {
+    "max_retries": 3,
+    "timeout_seconds": 300,
+    "batch_processing": false,
+    "parallel_content_generation": true
+  },
+  "content_settings": {
+    "max_content_length": 10000,
+    "min_content_length": 500,
+    "supported_languages": ["en"],
+    "content_filters": {
+      "enable_profanity_filter": true,
+      "enable_spam_detection": true,
+      "enable_duplicate_detection": true
+    }
+  },
+  "storage_settings": {
+    "google_docs": {
+      "auto_share": true,
+      "folder_structure": "content-machine/{date}/{content_type}",
+      "naming_convention": "{title}_{content_type}_{timestamp}"
+    },
+    "notion": {
+      "auto_tag": true,
+      "status_field": "Status",
+      "default_status": "Generated",
+      "tag_categories": ["topic", "source", "content_type", "quality_score"]
+    }
+  },
+  "notification_settings": {
+    "slack": {
+      "notify_on_success": true,
+      "notify_on_error": true,
+      "include_preview": true,
+      "mention_users": []
+    }
+  },
+  "monitoring": {
+    "enable_analytics": true,
+    "track_performance": true,
+    "log_level": "INFO",
+    "metrics_retention_days": 30
+  }
+}
